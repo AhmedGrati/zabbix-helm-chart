@@ -1,0 +1,94 @@
+{{- if .Values.zabbixweb.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "zabbix.fullname" . }}-zabbix-web
+  labels:
+    app: {{ template "zabbix.fullname" . }}-zabbix-web
+    app.kubernetes.io/name: zabbix-web
+    helm.sh/chart: {{ include "zabbix.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}-zabbix-web
+    app.kubernetes.io/managed-by: {{ .Release.Service }}-zabbix-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  {{ template "zabbix.fullname" . }}-zabbix-web
+  template:
+    metadata:
+      labels:
+        app: {{ template "zabbix.fullname" . }}-zabbix-web
+        app.kubernetes.io/name: zabbix-web
+        helm.sh/chart: {{ include "zabbix.chart" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}-zabbix-web
+        app.kubernetes.io/managed-by: {{ .Release.Service }}-zabbix-web
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: zabbix-web
+        resources:
+          {{- toYaml .Values.zabbixweb.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.zabbixweb.image.repository }}:{{ .Values.zabbixweb.image.tag }}"
+        imagePullPolicy: {{ .Values.zabbixweb.image.pullPolicy }}
+        env:
+          - name: ZBX_SERVER_HOST
+            value: {{ .Values.zabbixweb.ZBX_SERVER_HOST | quote }}
+          - name: ZBX_SERVER_PORT
+            value: {{ .Values.zabbixweb.ZBX_SERVER_PORT | quote }}
+          - name: DB_SERVER_HOST
+            value: {{ .Values.zabbixweb.DB_SERVER_HOST | quote }}
+          - name: DB_SERVER_PORT
+            value: {{ .Values.zabbixweb.DB_SERVER_PORT | quote }}
+          - name: POSTGRES_USER
+            value: {{ .Values.zabbixweb.POSTGRES_USER | quote }}
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgres-password
+                name: {{ .Values.zabbixweb.useExistingSecret }}
+          - name: POSTGRES_DB
+            value: {{ .Values.zabbixweb.POSTGRES_DB | quote }}
+          {{- range $item := .Values.zabbixweb.extraEnv }}
+          - name: {{ $item.name }}
+            value: {{ $item.value | quote  }}
+          {{- end }}
+        ports:
+          - name: zabbix-web
+            containerPort: 8080
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.livenessProbe.path }}
+            port: zabbix-web
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.readinessProbe.path }}
+            port: zabbix-web
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+      imagePullSecrets:
+      {{- range .Values.zabbixweb.image.pullSecrets }}
+        - name: {{ . | quote }}
+      {{- end }}
+{{- end }}
