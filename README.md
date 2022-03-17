@@ -22,7 +22,7 @@ In addition it is important to take a step back and have a look at the overall d
 You should already have an installed and configured postgresql on your node.
 ## Installation
 To install this chart you should follow these steps:
-1. CVreate a namespace using the following command:
+1. Create a namespace using the following command:
 ```shell
 kubectl create ns monitoring
 ```
