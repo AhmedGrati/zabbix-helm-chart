@@ -30,7 +30,6 @@ zabbixserver:
   POSTGRES_USER: "zabbix"
   # -- Password of database
   useExistingSecret: postgresql-secret
-  POSTGRES_PASSWORD: "PostgRes2Zabbix"
   # -- Name of database
   POSTGRES_DB: "zabbix"
   service:
