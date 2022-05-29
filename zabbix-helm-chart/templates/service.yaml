@@ -64,6 +64,9 @@ spec:
   ports:
     - port: {{ .Values.zabbixagent.service.port }}
       targetPort: 10050
+      {{- if and .Values.zabbixagent.service.nodePort (eq .Values.zabbixagent.service.type "NodePort") }}
+      nodePort: {{ .Values.zabbixagent.service.nodePort }}
+      {{- end }}
       protocol: TCP
       name: zabbix-agent
   selector:

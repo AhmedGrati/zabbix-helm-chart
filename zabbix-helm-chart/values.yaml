@@ -101,6 +101,9 @@ zabbixagent:
   # -- Enables use of **Zabbix Agent**
   enabled: true
   resources: {}
+  service:
+    type: NodePort
+    nodePort: 30020
   image:
     # -- Zabbix agent Docker image name. Can use zabbix/zabbix-agent or zabbix/zabbix-agent2
     repository: zabbix/zabbix-agent
