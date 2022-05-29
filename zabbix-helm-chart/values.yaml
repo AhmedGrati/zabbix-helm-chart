@@ -101,9 +101,6 @@ zabbixagent:
   # -- Enables use of **Zabbix Agent**
   enabled: true
   resources: {}
-  service:
-    type: NodePort
-    nodePort: 30020
   image:
     # -- Zabbix agent Docker image name. Can use zabbix/zabbix-agent or zabbix/zabbix-agent2
     repository: zabbix/zabbix-agent
@@ -138,7 +135,8 @@ zabbixagent:
   ZBX_VMWARECACHESIZE: 128M
   service:
     # -- Type of service for Zabbix agent
-    type: ClusterIP
+    type: NodePort
+    nodePort: 30020
     # -- Cluster IP for Zabbix agent
     clusterIP: 
     # -- Port to expose service
